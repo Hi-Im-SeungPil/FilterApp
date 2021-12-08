@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "922073609334",
+    "project_id": "jellybus-fedb5",
+    "storage_bucket": "jellybus-fedb5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:922073609334:android:df9e910f58556019c15b57",
+        "android_client_info": {
+          "package_name": "org.jeonfeel.jellybus2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "922073609334-gjlbtsqtof67r64hvisn9g04mf1tkdfp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.jeonfeel.jellybus2",
+            "certificate_hash": "d78ccd2e2bf1899aafe57b6fe071e0c87247f243"
+          }
+        },
+        {
+          "client_id": "922073609334-oqbqm1a6es22u0i45l4j4au1bo9vfn7v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnIqHaZaOZEf35BiN2lI3zhkdiRPLlduU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "922073609334-oqbqm1a6es22u0i45l4j4au1bo9vfn7v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
