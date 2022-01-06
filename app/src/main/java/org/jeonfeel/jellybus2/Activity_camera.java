@@ -4,6 +4,8 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -12,10 +14,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
+import androidx.camera.core.CameraControl;
 import androidx.camera.core.CameraSelector;
+import androidx.camera.core.FocusMeteringAction;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.MeteringPoint;
+import androidx.camera.core.MeteringPointFactory;
 import androidx.camera.core.Preview;
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
@@ -32,12 +39,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class Activity_camera extends AppCompatActivity {
-
     private final String TAG = "Activity_Camera";
     private ActivityCameraBinding binding;
     private ImageCapture imageCapture;
     private final Executor cameraExecutor = Executors.newSingleThreadExecutor();
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
+    private Camera camera;
+    private int LensFacing = CameraSelector.LENS_FACING_BACK;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,16 +56,7 @@ public class Activity_camera extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-        cameraProviderFuture = ProcessCameraProvider.getInstance(this);
-        cameraProviderFuture.addListener(() -> {
-            try {
-                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
-                bindPreview(cameraProvider);
-            } catch (ExecutionException | InterruptedException e) {
-                // No errors need to be handled for this Future.
-                // This should never be reached.
-            }
-        }, ContextCompat.getMainExecutor(this));
+        cameraSet();
 
         binding.btnTakePicture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,27 +65,30 @@ public class Activity_camera extends AppCompatActivity {
             }
         });
 
+        binding.btnSwitchCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setBtnSwitchCamera();
+            }
+        });
+
     }
-
-    void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
-        Preview preview = new Preview.Builder()
-                .build();
-
-        imageCapture = new ImageCapture.Builder()
-                .setTargetRotation(binding.viewFinder.getDisplay().getRotation())
-                .build();
-
-        CameraSelector cameraSelector = new CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                .build();
-
-        preview.setSurfaceProvider(binding.viewFinder.getSurfaceProvider());
-
-        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, preview,imageCapture);
+    // 카메라 초기 세팅
+    private void cameraSet() {
+        cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+        cameraProviderFuture.addListener(() -> {
+            try {
+                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+                cameraProvider.unbindAll();
+                startCamera(cameraProvider);
+            } catch (ExecutionException | InterruptedException e) {
+                // No errors need to be handled for this Future.
+                // This should never be reached.
+            }
+        }, ContextCompat.getMainExecutor(this));
     }
-
+    // 사진 캡쳐 후 저장
     private void takePicture(){
-
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.KOREA);
         String pictureName = simpleDateFormat.format(new Date()) + ".jpg";
 
@@ -124,5 +126,56 @@ public class Activity_camera extends AppCompatActivity {
                 }
         );
     }
+    // 카메라 전면 / 후면 변경 버튼
+    private void setBtnSwitchCamera(){
+        if(LensFacing == CameraSelector.LENS_FACING_BACK){
+            LensFacing = CameraSelector.LENS_FACING_FRONT;
+        }else{
+            LensFacing = CameraSelector.LENS_FACING_BACK;
+        }
+        cameraSet();
+    }
+    //카메라 시작
+    private void startCamera(ProcessCameraProvider cameraProvider){
+        Preview preview = new Preview.Builder()
+                .build();
 
+        imageCapture = new ImageCapture.Builder()
+                .setTargetRotation(binding.viewFinder.getDisplay().getRotation())
+                .build();
+
+        CameraSelector cameraSelector = new CameraSelector.Builder()
+                .requireLensFacing(LensFacing)
+                .build();
+
+        preview.setSurfaceProvider(binding.viewFinder.getSurfaceProvider());
+        camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, preview,imageCapture);
+        CameraControl cameraControl = camera.getCameraControl();
+        // 화면 터치하면 초점 잡기
+        binding.viewFinder.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    Log.d(TAG,"Focus On");
+                    MeteringPointFactory meteringPointFactory = new SurfaceOrientedMeteringPointFactory(
+                            Float.parseFloat(String.valueOf(binding.viewFinder.getWidth())),
+                            Float.parseFloat(String.valueOf(binding.viewFinder.getHeight()))
+                    );
+                    MeteringPoint meteringPoint = meteringPointFactory.createPoint(motionEvent.getX(),motionEvent.getY());
+                    try {
+                        Log.d(TAG,"try");
+                        FocusMeteringAction.Builder builder = new FocusMeteringAction.Builder(meteringPoint,FocusMeteringAction.FLAG_AF);
+                        cameraControl.startFocusAndMetering(builder.disableAutoCancel().build());
+
+                    }catch (Exception e){
+                        Log.d(TAG,"cat");
+                        e.printStackTrace();
+                    }
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        });
+    }
 }

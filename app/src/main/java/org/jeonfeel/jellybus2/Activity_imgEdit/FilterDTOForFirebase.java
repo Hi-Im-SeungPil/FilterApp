@@ -3,7 +3,6 @@ package org.jeonfeel.jellybus2.Activity_imgEdit;
 import androidx.annotation.Keep;
 
 public class FilterDTOForFirebase {
-
     private String matrix;
     private String name;
     private long sequence;

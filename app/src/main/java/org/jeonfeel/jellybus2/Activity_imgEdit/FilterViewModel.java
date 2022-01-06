@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class FilterViewModel extends AndroidViewModel {
-
     private final String TAG = "FilterViewModel";
     private Context context;
     private MutableLiveData<float[]> currentFilterLiveData;
@@ -50,35 +49,28 @@ public class FilterViewModel extends AndroidViewModel {
     }
 
     public MutableLiveData<float[]> getCurrentFilterLiveData() {
-
         if(currentFilterLiveData == null){
             currentFilterLiveData = new MutableLiveData<>();
         }
-
         return currentFilterLiveData;
     }
 
     // 필터 선택하면 이미지뷰 업데이트
     public void updateImageViewMatrix(ActivityImgEditBinding binding){
-
         ColorMatrixColorFilter matrixColorFilter = new ColorMatrixColorFilter(currentFilterLiveData.getValue());
         binding.ivImageView.setColorFilter(matrixColorFilter);
-
     }
 
     // 필터 리사이클러뷰 초기화
     public void rvFilterInit(ActivityImgEditBinding binding){
-
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(context, RecyclerView.HORIZONTAL,false);
         binding.rvFilter.setLayoutManager(mLinearLayoutManager);
         binding.rvFilter.setHasFixedSize(true);
-
     }
 
     // 편집한 파일 저장
     @SuppressLint("SimpleDateFormat")
     public int saveFile(Bitmap original) {
-
         Bitmap bitmap = Bitmap.createBitmap(original.getWidth(),
                 original.getHeight(), Bitmap.Config.ARGB_8888);
 
@@ -102,7 +94,6 @@ public class FilterViewModel extends AndroidViewModel {
 
         ContentResolver contentResolver = context.getContentResolver();
         Uri item = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
         try {
             ParcelFileDescriptor pdf = contentResolver.openFileDescriptor(item,"w",null);
 
@@ -125,18 +116,13 @@ public class FilterViewModel extends AndroidViewModel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return -1;
-
     }
 
     //선택한 uri 비트맵으로 변환
     public Bitmap ivImageViewInit(String uri,ActivityImgEditBinding binding){
-
         Bitmap bitmap = null;
-
         ImageDecoder.Source source = ImageDecoder.createSource(context.getContentResolver(), Uri.parse(uri));
-
         ImageDecoder.OnHeaderDecodedListener onHeaderDecodedListener = new ImageDecoder.OnHeaderDecodedListener() {
             @Override
             public void onHeaderDecoded(@NonNull ImageDecoder imageDecoder, @NonNull ImageDecoder.ImageInfo imageInfo, @NonNull ImageDecoder.Source source) {
@@ -144,40 +130,29 @@ public class FilterViewModel extends AndroidViewModel {
                 imageDecoder.setAllocator(ImageDecoder.ALLOCATOR_SOFTWARE);
             }
         };
-
         try {
             bitmap = ImageDecoder.decodeBitmap(source,onHeaderDecodedListener);
             binding.ivImageView.setImageBitmap(bitmap);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return bitmap;
     }
 
     // 커스텀 필터 내장 DB에서 불러오기
     public void getCustomFilterList(Adapter_rvFilter adapter_rvFilter){
-
         new Thread(new Runnable() {
             @Override
             public void run() {
                 List<FilterInfoDTO> filterInfoDTOS = new ArrayList<>();
                 List<CustomFilter> customFilters = db.customFilterDao().getAll();
-
                 if (customFilters != null) {
-
                     for (int i = 0; i < customFilters.size(); i++) {
-
                         String name = customFilters.get(i).getName();
-
                         String[] matrix = customFilters.get(i).getMatrix().split(",");
-
                         float[] parseFloatMatrix = new float[matrix.length];
-
                         for (int j = 0; j < parseFloatMatrix.length; j++) {
-
                             parseFloatMatrix[j] = Float.parseFloat(matrix[j]);
-
                         }
                         FilterInfoDTO filterInfoDTO = new FilterInfoDTO(parseFloatMatrix, name);
                         filterInfoDTOS.add(filterInfoDTO);
@@ -185,9 +160,6 @@ public class FilterViewModel extends AndroidViewModel {
                 }
                 adapter_rvFilter.setCustomFilterInfoDTOS(filterInfoDTOS);
             }
-
         }).start();
-
     }
-
 }

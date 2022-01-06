@@ -30,8 +30,8 @@ import org.jeonfeel.jellybus2.databinding.ActivityImgEditBinding;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Activity_imgEdit extends AppCompatActivity implements View.OnClickListener , View.OnTouchListener{
-
+public class Activity_imgEdit extends AppCompatActivity implements View.OnClickListener,
+        View.OnTouchListener{
     private final String TAG = "Activity_imgEdit";
     private final FirebaseDatabase DATABASE = FirebaseDatabase.getInstance();
     private final DatabaseReference REFERENCE = DATABASE.getReference();
@@ -43,7 +43,7 @@ public class Activity_imgEdit extends AppCompatActivity implements View.OnClickL
     private String selectedFilterGroup = "BASIC";
     private CustomLoadingDialog customLoadingDialog;
 
-    @SuppressLint("WrongThread")
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,15 +80,16 @@ public class Activity_imgEdit extends AppCompatActivity implements View.OnClickL
         window.getDecorView().setSystemUiVisibility(0);
     }
 
-    // Firebase에서 필터 불러오기.
+    // 필터화면 시작 시 Firebase에서 필터 불러오기.
     private void getFilterListFromFirebase(){
-
         filterDTOS = new ArrayList<>();
 
-        REFERENCE.child("FILTER").child("BASIC").orderByChild("sequence").addListenerForSingleValueEvent(new ValueEventListener() {
+        REFERENCE.child("FILTER")
+                .child("BASIC")
+                .orderByChild("sequence")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     FilterDTOForFirebase filterDTOForFirebase = dataSnapshot.getValue(FilterDTOForFirebase.class);
 
@@ -105,22 +106,15 @@ public class Activity_imgEdit extends AppCompatActivity implements View.OnClickL
                 }
 
                 adapter_rvFilter = new Adapter_rvFilter(Activity_imgEdit.this,filterDTOS,binding,model);
-
                 adapter_rvFilter.setSelectedImageBitmap(original);
-
                 model.getCustomFilterList(adapter_rvFilter);
-
                 binding.rvFilter.setAdapter(adapter_rvFilter);
-
                 if(customLoadingDialog != null)
                 customLoadingDialog.dismiss();
             }
-
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+            public void onCancelled(@NonNull DatabaseError error) {}
+                });
     }
 
     // onClickListener
@@ -156,11 +150,8 @@ public class Activity_imgEdit extends AppCompatActivity implements View.OnClickL
     // 원본으로 되돌리기
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-
         int action = motionEvent.getAction();
-
         if(model.getCurrentFilterLiveData().getValue() != null) {
-
             if(action == MotionEvent.ACTION_DOWN){
                 binding.ivImageView.setColorFilter(null);
                 binding.tvOriginal.setVisibility(View.VISIBLE);
@@ -169,7 +160,6 @@ public class Activity_imgEdit extends AppCompatActivity implements View.OnClickL
                 binding.tvOriginal.setVisibility(View.GONE);
             }
         }
-
         return true;
     }
 }

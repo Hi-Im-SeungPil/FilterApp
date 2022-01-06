@@ -2,7 +2,6 @@ package org.jeonfeel.jellybus2.Activity_imgEdit;
 
 
 public class FilterInfoDTO {
-
     private float[] matrix;
     private String name;
 

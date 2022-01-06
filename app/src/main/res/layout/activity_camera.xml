@@ -11,6 +11,16 @@
         android:layout_height="match_parent"/>
 
     <Button
+        android:id="@+id/btn_switchCamera"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/img_change_camara"/>
+
+    <Button
         android:id="@+id/btn_takePicture"
         android:layout_width="60dp"
         android:layout_height="60dp"

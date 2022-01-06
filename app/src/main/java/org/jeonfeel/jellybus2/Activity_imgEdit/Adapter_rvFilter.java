@@ -22,7 +22,6 @@ import org.jeonfeel.jellybus2.databinding.ActivityImgEditBinding;
 import java.util.List;
 
 public class Adapter_rvFilter extends RecyclerView.Adapter<Adapter_rvFilter.CustomViewHolder> {
-
     private final String TAG = "Adapter_rvFilter";
     private final Context context;
     private final ActivityImgEditBinding binding;
@@ -34,7 +33,10 @@ public class Adapter_rvFilter extends RecyclerView.Adapter<Adapter_rvFilter.Cust
     private FilterViewModel model;
     private String selectedFilter = "";
 
-    public Adapter_rvFilter(Context context,List<FilterInfoDTO> BasicFilterInfoDTOS,ActivityImgEditBinding binding,FilterViewModel model) {
+    public Adapter_rvFilter(Context context,
+                            List<FilterInfoDTO> BasicFilterInfoDTOS,
+                            ActivityImgEditBinding binding,
+                            FilterViewModel model) {
         this.context = context;
         this.selectedFilterInfoDTOS = BasicFilterInfoDTOS;
         this.basicFilterInfoDTOS = BasicFilterInfoDTOS;
@@ -47,13 +49,10 @@ public class Adapter_rvFilter extends RecyclerView.Adapter<Adapter_rvFilter.Cust
                 model.updateImageViewMatrix(binding);
             }
         });
-
     }
 
     public void setSelectedImageBitmap(Bitmap bitmap){
-
         this.selectedImageBitmap = bitmap;
-
     }
 
     @NonNull
@@ -69,8 +68,8 @@ public class Adapter_rvFilter extends RecyclerView.Adapter<Adapter_rvFilter.Cust
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Adapter_rvFilter.CustomViewHolder holder, int position) {
-
+    public void onBindViewHolder(@NonNull Adapter_rvFilter.CustomViewHolder holder,
+                                 int position) {
         String name = selectedFilterInfoDTOS.get(position).getName();
         float[] matrix = selectedFilterInfoDTOS.get(position).getMatrix();
 
@@ -88,13 +87,10 @@ public class Adapter_rvFilter extends RecyclerView.Adapter<Adapter_rvFilter.Cust
         holder.rvFilterParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if (!selectedFilter.equals(name)) {
-
                     selectedFilter = name;
                     currentFilterMatrix = matrix;
                     model.getCurrentFilterLiveData().setValue(currentFilterMatrix);
-
                     notifyItemRangeChanged(0,selectedFilterInfoDTOS.size());
                 }
             }
@@ -102,13 +98,11 @@ public class Adapter_rvFilter extends RecyclerView.Adapter<Adapter_rvFilter.Cust
     }
 
     public void setFilterDtos(String groupName){
-
         if(groupName.equals("BASIC")){
             this.selectedFilterInfoDTOS = basicFilterInfoDTOS;
         }else if(groupName.equals("CUSTOM")){
             this.selectedFilterInfoDTOS = customFilterInfoDTOS;
         }
-
         notifyDataSetChanged();
     }
 
@@ -129,12 +123,10 @@ public class Adapter_rvFilter extends RecyclerView.Adapter<Adapter_rvFilter.Cust
 
         public CustomViewHolder(@NonNull View itemView) {
             super(itemView);
-
             rvFilterParent = itemView.findViewById(R.id.rvFilterParent);
             iv_filterItem = itemView.findViewById(R.id.iv_filterItem);
             tv_filterItem = itemView.findViewById(R.id.tv_filterItem);
             iv_selectedBar = itemView.findViewById(R.id.iv_selectedBar);
-
         }
     }
 }

@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 
 public class CustomLoadingDialog extends Dialog {
-
     Animation animation;
     ImageView iv_loading;
 
@@ -20,7 +19,5 @@ public class CustomLoadingDialog extends Dialog {
         animation = AnimationUtils.loadAnimation(context,R.anim.img_moldiv_icon_anim);
         iv_loading = findViewById(R.id.iv_loading);
         iv_loading.startAnimation(animation);
-
     }
-
 }

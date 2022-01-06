@@ -28,8 +28,7 @@ import org.jeonfeel.jellybus2.databinding.ActivityCustomFilterBinding;
 
 import java.io.IOException;
 
-public class Activity_customFilter extends AppCompatActivity implements View.OnClickListener{
-
+public class Activity_customFilter extends AppCompatActivity implements View.OnClickListener {
     private final String TAG = "Activity_CustomFilter";
     private ActivityCustomFilterBinding binding;
     private int redNum = 0,greenNum = 0,blueNum = 0;
@@ -42,7 +41,6 @@ public class Activity_customFilter extends AppCompatActivity implements View.OnC
             0f,0f,1f,0f,0f,
             0f,0f,0f,1f,0f
     };
-
     private String customFilter_;
 
     @Override
@@ -79,18 +77,16 @@ public class Activity_customFilter extends AppCompatActivity implements View.OnC
         binding.btnGetSamplePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 resultLauncher.launch(intent);
-
             }
         });
 
+        // 밝기 조절 seekBar
         binding.skbBrightnessAdjustment.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
                 int seekBarProgress = seekBar.getProgress();
 
                 customFilter[4] = (float) seekBarProgress - 255f;
@@ -98,24 +94,21 @@ public class Activity_customFilter extends AppCompatActivity implements View.OnC
                 customFilter[14] = (float) seekBarProgress - 255f;
                 binding.tvBrightnessAdjustmentProgress.setText(String.valueOf(seekBarProgress - 255));
                 binding.ivSample.setColorFilter(new ColorMatrixColorFilter(customFilter));
-
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) {}
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
 
-    private void setBtnSaveCustomFilter(){
+    // 커스텀한 필터 저장
+    private void setBtnSaveCustomFilter() {
         EditText editText = new EditText(Activity_customFilter.this);
         editText.setHint("공백 불가!");
+
         AlertDialog.Builder builder = new AlertDialog.Builder(Activity_customFilter.this)
                 .setTitle("제목을 입력해 주세요")
                 .setView(editText)
@@ -124,57 +117,43 @@ public class Activity_customFilter extends AppCompatActivity implements View.OnC
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                         if(editText.length() != 0) {
-
                             String name = editText.getText().toString();
                             StringBuilder stringBuilder = new StringBuilder();
 
                             for (int j = 0; j < customFilter.length; j++){
                                 stringBuilder.append(customFilter[j]).append(",");
                             }
-
                             stringBuilder.deleteCharAt(stringBuilder.length()-1);
                             customFilter_ = stringBuilder.toString();
                             db.customFilterDao().insert(null,name,customFilter_);
                             Toast.makeText(Activity_customFilter.this, "저장이 완료 되었습니다.", Toast.LENGTH_SHORT).show();
                             finish();
-
                         }else{
-
                             Toast.makeText(Activity_customFilter.this, "공백 안되요ㅠㅠ..", Toast.LENGTH_SHORT).show();
-
                         }
                     }
                 })
                 .setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
+                    public void onClick(DialogInterface dialogInterface, int i) {}
                 });
-
         AlertDialog alertDialog =  builder.create();
         alertDialog.show();
     }
 
-    private void resultLauncher(){
-
+    // 사진 불러온 결과 resultLauncher
+    private void resultLauncher() {
         resultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
                         if(result.getResultCode() == RESULT_OK){
-
                             Intent intent = result.getData();
-
                             if(intent != null){
-
                                 Uri selectedImageUri = intent.getData();
-
                                 Bitmap bitmap = null;
-
                                 ImageDecoder.Source source = ImageDecoder.createSource(Activity_customFilter.this.getContentResolver(), selectedImageUri);
-
                                 ImageDecoder.OnHeaderDecodedListener onHeaderDecodedListener = new ImageDecoder.OnHeaderDecodedListener() {
                                     @Override
                                     public void onHeaderDecoded(@NonNull ImageDecoder imageDecoder, @NonNull ImageDecoder.ImageInfo imageInfo, @NonNull ImageDecoder.Source source) {
@@ -186,7 +165,6 @@ public class Activity_customFilter extends AppCompatActivity implements View.OnC
                                     bitmap = ImageDecoder.decodeBitmap(source,onHeaderDecodedListener);
                                     binding.ivSample.setImageBitmap(bitmap);
                                     binding.ivSample.setColorFilter(new ColorMatrixColorFilter(customFilter));
-
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                     Toast.makeText(Activity_customFilter.this, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
@@ -198,9 +176,9 @@ public class Activity_customFilter extends AppCompatActivity implements View.OnC
                 });
     }
 
+    //필터 커스텀할 버튼들 set
     @Override
     public void onClick(View view) {
-
         if (view == binding.btnRedMinus && redNum > -10){
             redNum -= 1;
             binding.tvRedNum.setText(String.valueOf(redNum));
